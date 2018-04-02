@@ -1,5 +1,7 @@
+import os.path
 import re
 
+from voluptuous import Invalid
 from voluptuous.schema_builder import message
 from voluptuous.validators import truth
 
@@ -29,3 +31,14 @@ def LXDIdentifier(v):
     if len(v) > 63:
         return False
     return lxd_identifier_re.match(v)
+
+
+def IsDirAfterExpandUser(path):
+    if type(path) != str:
+        raise Invalid("expected a string path")
+
+    path = os.path.expanduser(path)
+    if not os.path.isdir(path):
+        raise Invalid("expected path {} to exists".format(path))
+
+    return path

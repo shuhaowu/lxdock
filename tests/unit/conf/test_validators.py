@@ -1,7 +1,10 @@
+import os.path
+
 import pytest
+from voluptuous import Invalid
 from voluptuous.error import ValueInvalid
 
-from lxdock.conf.validators import Hostname, LXDIdentifier
+from lxdock.conf.validators import Hostname, IsDirAfterExpandUser, LXDIdentifier
 
 
 class TestHostnameValidator:
@@ -43,3 +46,13 @@ class TestLXDIdentifier:
         assert id_validator('i' * 63)
         with pytest.raises(ValueInvalid):
             id_validator('i' * 64)
+
+
+class TestIsDirAfterExpandUser:
+    def test_converts_dir_if_encountering_tilde(self):
+        expanded_path = IsDirAfterExpandUser("~/.ssh")
+        assert expanded_path == os.path.expanduser("~/.ssh")
+
+    def test_raise_invalid_if_not_directory(self):
+        with pytest.raises(Invalid):
+            IsDirAfterExpandUser("/adkfjak/adfkjakf/adkfjakjdf")

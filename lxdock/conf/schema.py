@@ -1,8 +1,7 @@
-from voluptuous import (ALLOW_EXTRA, All, Any, Coerce, Extra, In, IsDir, Length, Required, Schema,
-                        Url)
+from voluptuous import ALLOW_EXTRA, All, Any, Coerce, Extra, In, Length, Required, Schema, Url
 
 from ..provisioners import Provisioner
-from .validators import Hostname, LXDIdentifier
+from .validators import Hostname, IsDirAfterExpandUser, LXDIdentifier
 
 
 def get_schema():
@@ -18,8 +17,7 @@ def get_schema():
         'provisioning': [],  # will be set dynamically using provisioner classes...
         'server': Url(),
         'shares': [{
-            # The existence of the source directory will be checked!
-            'source': IsDir(),
+            'source': IsDirAfterExpandUser,
             'dest': str,
             'set_host_acl': bool,  # TODO: need a way to deprecate this
         }],
