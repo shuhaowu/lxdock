@@ -418,10 +418,20 @@ class Container:
             'source': x11_options.get('xsocket_path', '/tmp/.X11-unix/X0'),
         }
 
+        xauthority_path = os.getenv(
+            "XAUTHORITY",
+            os.path.join(os.path.expanduser("~"), ".Xauthority")
+        )
+
+        xauthority_path = x11_options.get("xauthority_path", xauthority_path)
+
         container.devices['{}Xauthority'.format(namespace)] = {
             'type': 'disk',
-            'path': os.path.join(self._guest.user_home_path(self._default_username), ".Xauthority"),
-            'source': x11_options.get('xauthority_path', os.path.join(os.path.expanduser("~"), ".Xauthority")),
+            'path': os.path.join(
+                self._guest.user_home_path(self._default_username),
+                ".Xauthority"
+            ),
+            'source': xauthority_path,
         }
 
         # Share GPU into the container
