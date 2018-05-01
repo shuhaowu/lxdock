@@ -448,21 +448,28 @@ class Container:
 
         # Share any other paths into the container as readonly, like
         # /usr/lib/nvidia-384
-        for i, path in enumerate(x11_options.get("extra_driver_paths", [])):
+        extra_driver_paths = x11_options.get("extra_driver_paths", [])
+        for i, path in enumerate(extra_driver_paths):
             # Only share the ones found in case people have multiple
             # computers with different configuration running the same
             # lxdock.yml
             if os.path.exists(path):
-                logger.warning("{} does not exist, skipping the share".format(path))
                 container.devices["{}driver{}".format(namespace, i)] = {
+                    'type': 'disk',
                     'path': path,
                     'source': path,
-                    'readonly': True
+                    'readonly': "true"
                 }
+            else:
+                logger.warning("{} does not exist, skipping the share".format(path))
 
         if x11_options.get("setup_guest_profile_d", True):
             content = "export DISPLAY=:0"
             self._guest.add_profile_d("xdisplay.sh", content)
+
+        if len(extra_driver_paths) > 0:
+            content = "export LD_LIBRARY_PATH={}".format(":".join(extra_driver_paths))
+            self._guest.add_profile_d("gpu_driver_ld_library.sh", content)
 
         raw_idmap_updated = self._setup_guest_idmap()
 
