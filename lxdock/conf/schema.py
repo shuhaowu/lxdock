@@ -1,7 +1,7 @@
 from voluptuous import ALLOW_EXTRA, All, Any, Coerce, Extra, In, Length, Required, Schema, Url
 
 from ..provisioners import Provisioner
-from .validators import Hostname, IsDirAfterExpandUser, LXDIdentifier
+from .validators import ExpandUserIfExists, Hostname, LXDIdentifier
 
 
 def get_schema():
@@ -17,9 +17,10 @@ def get_schema():
         'provisioning': [],  # will be set dynamically using provisioner classes...
         'server': Url(),
         'shares': [{
-            'source': IsDirAfterExpandUser,
+            'source': ExpandUserIfExists,
             'dest': str,
             'set_host_acl': bool,  # TODO: need a way to deprecate this
+            'share_properties': {Extra: Coerce(str)},
         }],
         'shell': {
             'user': str,

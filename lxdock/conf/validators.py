@@ -33,12 +33,8 @@ def LXDIdentifier(v):
     return lxd_identifier_re.match(v)
 
 
-def IsDirAfterExpandUser(path):
+def ExpandUserIfExists(path):
     if type(path) != str:
         raise Invalid("expected a string path")
 
-    path = os.path.expanduser(path)
-    if not os.path.isdir(path):
-        raise Invalid("expected path {} to exists".format(path))
-
-    return path
+    return os.path.expanduser(path)
