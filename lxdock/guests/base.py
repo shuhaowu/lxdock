@@ -118,7 +118,7 @@ class Guest(with_metaclass(_GuestBase)):
         self.run(['mkdir', '-p', '/root/.ssh'])
         self.lxd_container.files.put('/root/.ssh/authorized_keys', pubkey)
 
-    def create_user(self, username, home=None, password=None, shell=None):
+    def create_user(self, username, home=None, password=None, shell=None, sudoer=False):
         """ Adds the passed user to the container system. """
         options = ['--create-home', ]
         if home is not None:
@@ -127,7 +127,12 @@ class Guest(with_metaclass(_GuestBase)):
             options += ['-p', password, ]
         if shell is not None:
             options += ['-s', shell, ]
+
         self.run(['useradd', ] + options + [username, ])
+
+        if sudoer:
+            content = '{} ALL=(ALL) NOPASSWD:ALL'.format(username)
+            self.lxd_container.files.put("/etc/sudoers.d/{}_sudoer".format(username), content)
 
     def uidgid(self, username):
         """Obtain the uid and gid """
