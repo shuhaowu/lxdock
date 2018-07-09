@@ -131,6 +131,11 @@ class Guest(with_metaclass(_GuestBase)):
         self.run(['useradd', ] + options + [username, ])
 
         if sudoer:
+            try:
+                self.lxd_container.files.get("/etc/sudoers")
+            except NotFound:
+                self.install_packages(["sudo"])
+
             content = '{} ALL=(ALL) NOPASSWD:ALL'.format(username)
             self.lxd_container.files.put("/etc/sudoers.d/{}_sudoer".format(username), content)
 
