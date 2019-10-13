@@ -1,4 +1,5 @@
-from voluptuous import ALLOW_EXTRA, All, Any, Coerce, Extra, In, Length, Required, Schema, Url
+from voluptuous import (ALLOW_EXTRA, All, Any, Coerce, Extra, In, Length, Required, Schema,
+                        Url, PathExists)
 
 from ..provisioners import Provisioner
 from .validators import ExpandUserIfExists, Hostname, LXDIdentifier
@@ -34,6 +35,14 @@ def get_schema():
             'shell': str,
             'sudoer': bool,
         }],
+        'x11': {
+            'enabled': bool,
+            'xsocket_path': PathExists(),
+            'xauthority_path': PathExists(),
+            'extra_driver_paths': [str],
+            'setup_guest_profile_d': bool,
+            'gpu_properties': {Extra: Coerce(str)}
+        },
         'extras': {
             'network_wait_timeout': int
         }
